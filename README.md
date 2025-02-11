@@ -88,7 +88,7 @@ We provide the following example weights:
 | 3           | **Lane Changing**       | `safebench/agent/model_ckpt/adv_train/sac/text_to_scene/scenario_3/model.sac.-001.torch` |
 | 6           | **Unprocted Left-turn** | `safebench/agent/model_ckpt/adv_train/sac/text_to_scene/scenario_6/model.sac.-001.torch` |
 
-To use the example models, set the `test_epoch` flag to be `-1`.
+To use the example weights, set the `test_epoch` flag to be `-1`.
 
 ## C. Environment 🌍
 
