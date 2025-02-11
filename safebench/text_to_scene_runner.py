@@ -72,8 +72,8 @@ class TextToSceneRunner:
             "max_waypt": 12,  # maximum number of waypoints
             "lidar_bin": 0.125,  # bin size of lidar sensor (meter)
             "out_lane_thres": 4,  # threshold for out of lane (meter)
-            "desired_speed": 8,  # desired speed (m/s)
-            "low_speed": 4,  # low speed (m/s)
+            "desired_speed": 6,  # desired speed (m/s)
+            "low_speed": 2,  # low speed (m/s)
             "image_sz": 1024,  # TODO: move to config of od scenario
         }
 
@@ -229,6 +229,7 @@ class TextToSceneRunner:
             self.agent_policy.set_ego_and_route(self.env.get_ego_vehicles(), infos)
 
             carla_client = self._init_client(sampled_scenario_configs[0])
+            carla_client.set_seed()
             carla_client.spawn_all_agent(
                 None,
                 sampled_scenario_configs[0].llm_planning["planning"]["agents"],

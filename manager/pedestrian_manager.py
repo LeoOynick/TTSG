@@ -128,11 +128,52 @@ class PedestrianManager:
                         else:
                             destination = new_des
                         cur_depth += 1
+                        
+                    mixed_point = None
+                    if random.random() < 0.5:
+                        if (
+                            destination.get_left_lane() is not None
+                            and destination.get_left_lane().lane_type == carla.LaneType.Driving
+                        ):
+                            mixed_point = destination.get_left_lane()
+                        elif (
+                            destination.get_right_lane() is not None
+                            and destination.get_right_lane().lane_type == carla.LaneType.Driving
+                        ):
+                            mixed_point = destination.get_right_lane()
+                    else:
+                        if (
+                            destination.get_right_lane() is not None
+                            and destination.get_right_lane().lane_type == carla.LaneType.Driving
+                        ):
+                            mixed_point = destination.get_right_lane()
+                        elif (
+                            destination.get_left_lane() is not None
+                            and destination.get_left_lane().lane_type == carla.LaneType.Driving
+                        ):
+                            mixed_point = destination.get_left_lane()
+                    if mixed_point is not None:
+                        interp = random.random() * 0.2 + 0.8
+                        destination = (
+                            destination.transform.location * interp
+                            + mixed_point.transform.location * (1 - interp)
+                        )
+                    if random.random() < 0.1:
+                        find_point = get_different_lane(spawn_point)
+                        destination = self.world_manager.get_waypoint_from_location_with_ensure(
+                            find_point,
+                            [
+                                carla.LaneType.Sidewalk,
+                                carla.LaneType.Shoulder,
+                                carla.LaneType.Driving,
+                            ],
+                        )
                 elif agent["action"] == "on_the_sidewalk":
                     destination = random.choice(
                         get_points_to_front(spawn_point)[1:] + get_points_to_end(spawn_point)[1:]
                     )
-
+                if isinstance(destination, carla.Waypoint):
+                    destination = destination.transform.location
                 walker_controller.set_destination(destination.transform.location)
             self.walker_controller_list.append(walker_controller)
 

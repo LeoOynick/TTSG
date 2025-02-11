@@ -1,6 +1,6 @@
 policy_type: 'rl'
 obs_type: 0
-train_episode: 600
+train_episode: 800
 eval_in_train_freq: 1
 buffer_capacity: 20000
 buffer_start_training: 1000

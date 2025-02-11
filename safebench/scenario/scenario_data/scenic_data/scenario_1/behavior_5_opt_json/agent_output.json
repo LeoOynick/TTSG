@@ -39,7 +39,7 @@
         "action": "block_the_ego",
         "behavior": "aggressive",
         "pos_id": 2,
-        "road_type": "driving",
+        "road_type": "shoulder",
         "relative_to_ego": "front_right"
       }
     ]

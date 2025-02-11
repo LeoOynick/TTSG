@@ -34,7 +34,7 @@
         "is_ego": true,
         "action": "go_straight",
         "behavior": "normal",
-        "pos_id": 1,
+        "pos_id": 5,
         "road_type": "driving",
         "relative_to_ego": "none"
       },
@@ -43,8 +43,8 @@
         "is_ego": false,
         "action": "block_the_ego",
         "behavior": "aggressive",
-        "pos_id": 2,
-        "road_type": "driving",
+        "pos_id": 1,
+        "road_type": "shoulder",
         "relative_to_ego": "front_right"
       },
       {
@@ -54,7 +54,7 @@
         "behavior": "normal",
         "pos_id": 3,
         "road_type": "shoulder",
-        "relative_to_ego": "right"
+        "relative_to_ego": "front_right"
       }
     ]
   }

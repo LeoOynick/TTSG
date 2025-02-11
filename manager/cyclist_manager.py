@@ -93,7 +93,7 @@ class CyclistManager:
         return direction_to_road_id if get_road_id_only else direction_to_point
 
     def set_cyclist_agent_action(
-        self, agent: CyclistAgent, action, ego_agent, spawn_point, num_interpolate=10
+        self, agent: CyclistAgent, action, ego_agent, spawn_point, init_road_type, num_interpolate=10
     ):
         go_left_straight_right = self.get_left_straight_right(
             self.world_manager.get_waypoint_from_location(
@@ -123,7 +123,7 @@ class CyclistManager:
             else:
                 agent.agent.lane_change("right")
             agent.use_original = True
-        elif action == "block_the_ego":
+        elif action == "block_the_ego" and init_road_type not in ["sidewalk", "shoulder"]:
             # Set the same location as the ego vehicle
             destination = self.vehicle_agent[0].destination_waypoint.next(DISTANCE_FOR_ROUTE * 5)[0]
             agent.agent.set_destination(
@@ -169,7 +169,7 @@ class CyclistManager:
             vehicle, behavior=behavior, plan=agent_info["action"] == "block_the_ego"
         )
         self.set_cyclist_agent_action(
-            agent, agent_info.get("action", "go_straight"), ego_agent, spawn_point
+            agent, agent_info.get("action", "go_straight"), ego_agent, spawn_point, agent_info.get("road_type", "driving")
         )
         return agent
 

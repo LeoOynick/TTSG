@@ -341,11 +341,6 @@ class VehicleManager:
         if get_plan:
             required_point = getattr(self, f"{position}_required")
             waypoints = getattr(self, f"points_to_{position}")
-            if required_point < CLIP_NUM_POINTS and len(waypoints) > CLIP_NUM_POINTS:
-                if position == "front":
-                    waypoints = waypoints[-CLIP_NUM_POINTS:]
-                else:
-                    waypoints = waypoints[CLIP_NUM_POINTS:]
             if len(waypoints) > required_point:
                 choose_start_idx = random.choice(range(len(waypoints) - required_point))
                 waypoints = waypoints[choose_start_idx:]

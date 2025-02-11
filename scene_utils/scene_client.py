@@ -1,4 +1,6 @@
 import copy
+import secrets
+import random
 import weakref
 from collections import defaultdict
 from queue import Queue
@@ -280,6 +282,12 @@ class CarlaClient:
         )
         self.bev_camera.listen(lambda image: self.parse_image(weak_self, image, "bev_image_queue"))
         self.world.tick()
+        
+    def set_seed(self, seed=None):
+        if seed is None:
+            seed = secrets.randbelow(1_000_000_000)
+        np.random.seed(seed)
+        random.seed(seed)
 
     def spawn_all_agent(
         self,

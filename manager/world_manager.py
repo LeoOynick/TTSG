@@ -82,28 +82,6 @@ class WorldManager:
 
     def get_driving(self, road_id):
         road_waypoints = self.get_all_waypoints_from_road(road_id)
-        # driving_points = []
-        # for waypoint in road_waypoints:
-        #     driving_point = self.map.get_waypoint(
-        #         waypoint.transform.location,
-        #         project_to_road=True,
-        #         lane_type=carla.LaneType.Driving,
-        #     )
-        #     if driving_point is not None and (
-        #         (len(driving_points) == 0)
-        #         or (
-        #             min(
-        #                 [
-        #                     self.compute_distance(
-        #                         driving_point.transform.location, exist_point.transform.location
-        #                     )
-        #                     for exist_point in driving_points
-        #                 ]
-        #             )
-        #             > 1.5
-        #         )
-        #     ):
-        #         driving_points.append(driving_point)
         return road_waypoints
 
     def get_left_right_driving_points(self, road_id):

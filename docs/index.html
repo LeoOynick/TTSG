@@ -41,12 +41,12 @@
 </head>
 <style>
   .best {
-    background-color: rgb(255, 138, 138, 0.7);
+    font-weight: bold;
   }
 
 
   .second-best {
-    background-color: rgb(255, 145, 0, 0.6);
+    text-decoration: underline;
   }
 
   #btt-bttn {
@@ -499,92 +499,6 @@
   <section class="section">
     <div class="container is-max-desktop">
       <h2 class="title is-3">Experiments</h2>
-      <div class="content">
-        <h3 class="subtitle is-4">Diversity Test</h3>
-        <p> We provide a diversity test to evaluate the diversity of the generated traffic scenes. We make eight
-          different scenes and test each scene five times. We report the <i>"Agent Diversity"</i> (AD), <i>"Road
-            Diversity"</i> (RD), and <i>"Text Matching"</i> (TM). Prompts for the diversity test can be found in <a
-            href="https://github.com/basiclab/TTSG/tree/main/diversity_test" target="_blank">here</a>.
-        <div class="table-container">
-          <table class="table">
-            <thead>
-              <tr>
-                <th rowspan="3" colspan="1" class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">Metric
-                </th>
-                <th colspan="8" class="has-text-centered">Scenario</th>
-                <th rowspan="3" class="has-text-centered">Avg.</th>
-              </tr>
-              <tr>
-                <th colspan="2" class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">Normal</th>
-                <th colspan="3" class="has-text-centered">Critical</th>
-                <th colspan="3" class="has-text-centered">Conditional</th>
-              </tr>
-              <tr>
-                <th colspan="1" class="has-text-centered is-size-7" style="vertical-align: middle;">Daily<br />Traffic
-                </th>
-                <th colspan="1" class="has-text-centered is-size-7" style="vertical-align: middle;">Intersection</th>
-                <th class="has-text-centered is-size-7" style="vertical-align: middle;">
-                  Pedestrian<br />Crushing</th>
-                <th colspan="1" class="has-text-centered is-size-7"
-                  style="vertical-align: middle; border-right: none !important;">Blocking<br />Agent
-                </th>
-                <th colspan="1" class="has-text-centered is-size-7"
-                  style="vertical-align: middle; border-right: 1.5px solid #dbdbdb;">
-                  Dangerous<br />Cut-off</th>
-                <th colspan="1" class="has-text-centered is-size-7" style="vertical-align: middle;">Only
-                  having<br />Two-wheel<br />Vehicles</th>
-                <th colspan="1" class="has-text-centered is-size-7"
-                  style="vertical-align: middle; border-right: none !important;">
-                  Having<br />Emergency<br />Vehicles</th>
-                <th colspan="1" class="has-text-centered is-size-7"
-                  style="vertical-align: middle; border-right: 1.5px solid #dbdbdb;">Rainy<br />Weather</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">AD<span
-                    style="font-size:small;">↥</span></th>
-                <td class="has-text-centered">0.789</td>
-                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">0.833</td>
-                <td class="has-text-centered">0.500</td>
-                <td class="has-text-centered">0.750</td>
-                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">0.600</td>
-                <td class="has-text-centered">0.714</td>
-                <td class="has-text-centered">0.500</td>
-                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">0.800</td>
-                <td class="has-text-centered">0.686</td>
-              </tr>
-              <tr>
-                <th class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">RD<span
-                    style="font-size:small;">↥</span></th>
-                <td class="has-text-centered">1.000</td>
-                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">1.000</td>
-                <td class="has-text-centered">1.000</td>
-                <td class="has-text-centered">1.000</td>
-                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">1.000</td>
-                <td class="has-text-centered">0.800</td>
-                <td class="has-text-centered">1.000</td>
-                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">1.000</td>
-                <td class="has-text-centered">0.975</td>
-              </tr>
-              <tr>
-                <th class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">TM<span
-                    style="font-size:small;">↥</span></th>
-                <td class="has-text-centered">1.000</td>
-                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">0.800</td>
-                <td class="has-text-centered">0.400</td>
-                <td class="has-text-centered">0.800</td>
-                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">0.800</td>
-                <td class="has-text-centered">0.600</td>
-                <td class="has-text-centered">1.000</td>
-                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">1.000</td>
-                <td class="has-text-centered">0.800</td>
-              </tr>
-            </tbody>
-
-          </table>
-        </div>
-      </div>
       <div class=" content">
         <h3 class="subtitle is-4">Critical Scenario</h3>
         <p>We show that our approach can also be used to train the agent under the critical scenario by selected three
@@ -638,14 +552,14 @@
                 <th class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">CS</a>
                 </th>
                 <td class="second-best has-text-centered">0.030</td>
-                <td class="best has-text-centered">0.110</td>
+                <td class="second-best has-text-centered">0.110</td>
                 <td style="border-right: 1px solid #dbdbdb;" colspan="1" class="has-text-centered">0.100</td>
                 <td style="border-right: none !important;" class="second-best has-text-centered">0.080</td>
               </tr>
               <tr>
                 <th class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">Ours</th>
-                <td class="best has-text-centered">0.000</td>
-                <td class="second-best has-text-centered">0.020</td>
+                <td class="best has-text-centered">0.021</td>
+                <td class="best has-text-centered">0.085</td>
                 <td style="border-right: 1px solid #dbdbdb;" class="best has-text-centered">0.000</td>
                 <td style="border-right: none !important;" class="best has-text-centered">0.067</td>
               </tr>
@@ -678,20 +592,20 @@
               <tr>
                 <th class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">CS</a>
                 </th>
-                <td class="second-best has-text-centered">0.905</td>
+                <td class="best has-text-centered">0.905</td>
                 <td class="best has-text-centered">0.906</td>
                 <td style="border-right: 1px solid #dbdbdb;" class="has-text-centered">0.903</td>
                 <td style="border-right: none !important;" class="second-best has-text-centered">0.905</td>
               </tr>
               <tr>
                 <th colspan="1" class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">Ours</th>
-                <td colspan="1" class="best has-text-centered">0.955</td>
-                <td colspan="1" class="second-best has-text-centered">0.861</td>
+                <td colspan="1" class="second-best has-text-centered">0.895</td>
+                <td colspan="1" class="second-best has-text-centered">0.894</td>
                 <td style="border-right: 1px solid #dbdbdb;" colspan="1" class="second-best   has-text-centered">
-                  0.951
+                  0.953
                 </td>
                 <td style="border-right: none !important;" colspan="1" class="best has-text-centered">
-                  0.922
+                  0.914
                 </td>
               </tr>
             </tbody>
@@ -809,6 +723,138 @@
     </div>
   </section>
 
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3">Discussion</h2>
+      <div class="content">
+        <h3 class="subtitle is-4">Diversity Test</h3>
+        <p> We provide a diversity test to evaluate the diversity of the generated traffic scenes. We make eight
+          different scenes and test each scene five times. We report the <i>"Agent Diversity"</i> (AD), <i>"Road
+            Diversity"</i> (RD), and <i>"Text Matching"</i> (TM). Prompts for the diversity test can be found in <a
+            href="https://github.com/basiclab/TTSG/tree/main/diversity_test" target="_blank">here</a>.
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th rowspan="3" colspan="1" class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">Metric
+                </th>
+                <th colspan="8" class="has-text-centered">Scenario</th>
+                <th rowspan="3" class="has-text-centered">Avg.</th>
+              </tr>
+              <tr>
+                <th colspan="2" class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">Normal</th>
+                <th colspan="3" class="has-text-centered">Critical</th>
+                <th colspan="3" class="has-text-centered">Conditional</th>
+              </tr>
+              <tr>
+                <th colspan="1" class="has-text-centered is-size-7" style="vertical-align: middle;">Daily<br />Traffic
+                </th>
+                <th colspan="1" class="has-text-centered is-size-7" style="vertical-align: middle;">Intersection</th>
+                <th class="has-text-centered is-size-7" style="vertical-align: middle;">
+                  Pedestrian<br />Crushing</th>
+                <th colspan="1" class="has-text-centered is-size-7"
+                  style="vertical-align: middle; border-right: none !important;">Blocking<br />Agent
+                </th>
+                <th colspan="1" class="has-text-centered is-size-7"
+                  style="vertical-align: middle; border-right: 1.5px solid #dbdbdb;">
+                  Dangerous<br />Cut-off</th>
+                <th colspan="1" class="has-text-centered is-size-7" style="vertical-align: middle;">Only
+                  having<br />Two-wheel<br />Vehicles</th>
+                <th colspan="1" class="has-text-centered is-size-7"
+                  style="vertical-align: middle; border-right: none !important;">
+                  Having<br />Emergency<br />Vehicles</th>
+                <th colspan="1" class="has-text-centered is-size-7"
+                  style="vertical-align: middle; border-right: 1.5px solid #dbdbdb;">Rainy<br />Weather</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">AD<span
+                    style="font-size:small;">↥</span></th>
+                <td class="has-text-centered">0.789</td>
+                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">0.833</td>
+                <td class="has-text-centered">0.500</td>
+                <td class="has-text-centered">0.750</td>
+                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">0.600</td>
+                <td class="has-text-centered">0.714</td>
+                <td class="has-text-centered">0.500</td>
+                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">0.800</td>
+                <td class="has-text-centered">0.686</td>
+              </tr>
+              <tr>
+                <th class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">RD<span
+                    style="font-size:small;">↥</span></th>
+                <td class="has-text-centered">1.000</td>
+                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">1.000</td>
+                <td class="has-text-centered">1.000</td>
+                <td class="has-text-centered">1.000</td>
+                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">1.000</td>
+                <td class="has-text-centered">0.800</td>
+                <td class="has-text-centered">1.000</td>
+                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">1.000</td>
+                <td class="has-text-centered">0.975</td>
+              </tr>
+              <tr>
+                <th class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">TM<span
+                    style="font-size:small;">↥</span></th>
+                <td class="has-text-centered">1.000</td>
+                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">0.800</td>
+                <td class="has-text-centered">0.400</td>
+                <td class="has-text-centered">0.800</td>
+                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">0.800</td>
+                <td class="has-text-centered">0.600</td>
+                <td class="has-text-centered">1.000</td>
+                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">1.000</td>
+                <td class="has-text-centered">0.800</td>
+              </tr>
+            </tbody>
+
+          </table>
+        </div>
+        <h3 class="subtitle is-4">Caption Driving</h3>
+        <p>We demonstrate how our pipeline can be used for training captioning model under critical scenario. We report the <i>"BLEU"</i> (B), <i>"METEOR"</i> (M), and <i>"CIDEr"</i> (C) for narration and reasoning.</p>
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th rowspan="2" colspan="1" class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;"></th>
+                <th colspan="3" class="has-text-centered" >Narration</th>
+                <th colspan="3" class="has-text-centered" style="border-right: none !important;">Reasoning</th>
+              </tr>
+              <tr>
+                <td class="has-text-centered" style="border-right: none !important;">B</td>
+                <td class="has-text-centered">M</td>
+                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">C</td>
+                <td class="has-text-centered">B</td>
+                <td class="has-text-centered">M</td>
+                <td class="has-text-centered">C</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th class="has-text-centered">original</th>
+                <td class="has-text-centered">4.8</td>
+                <td class="has-text-centered">13.5</td>
+                <td class="has-text-centered">15.2</td>
+                <td class="has-text-centered">0.0</td>
+                <td class="has-text-centered">10.0</td>
+                <td class="has-text-centered">18.4</td>
+              </tr>
+              <tr style="border-bottom: 1.5px solid #dbdbdb;">
+                <th class="has-text-centered">finetuned</th>
+                <td class="best has-text-centered">9.9</td>
+                <td class="best has-text-centered">18.4</td>
+                <td class="best has-text-centered">52.9</td>
+                <td class="best has-text-centered">7.2</td>
+                <td class="best has-text-centered">11.2</td>
+                <td class="best has-text-centered">51.9</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
   <section class="section" id="BibTeX">
     <div class="container is-max-desktop content">
       <h2 class="title">Reference</h2>

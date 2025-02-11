@@ -80,7 +80,7 @@ python scripts/run_train.py --agent_cfg=adv_text_to_scene.yaml --scenario_cfg=tr
 python scripts/run_eval.py --agent_cfg=adv_text_to_scene.yaml --scenario_cfg=eval_scenic.yaml --mode eval --scenario_id <scenario_id> --test_epoch <epoch>
 ```
 
-We provide the following pretrained models:
+We provide the following example weights:
 
 | Scenario ID | Scenario Name           | Path                                                                                     |
 | :---------- | ----------------------- | ---------------------------------------------------------------------------------------- |
@@ -88,7 +88,7 @@ We provide the following pretrained models:
 | 3           | **Lane Changing**       | `safebench/agent/model_ckpt/adv_train/sac/text_to_scene/scenario_3/model.sac.-001.torch` |
 | 6           | **Unprocted Left-turn** | `safebench/agent/model_ckpt/adv_train/sac/text_to_scene/scenario_6/model.sac.-001.torch` |
 
-To use our pretrained models, set the `test_epoch` flag to be `-1`.
+To use the example models, set the `test_epoch` flag to be `-1`.
 
 ## C. Environment 🌍
 

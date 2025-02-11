@@ -94,7 +94,11 @@ class CyclistAgent:
                 self.cyclist.apply_control(self.agent.run_step())
                 return False
 
-        if self.destination is None or not self.cyclist.is_alive or not self.ego_agent.is_alive:
+        if (
+            self.destination is None
+            or not self.cyclist.is_alive
+            or (self.ego_agent is not None and not self.ego_agent.is_alive)
+        ):
             return True
         if self.check_finish():
             self.cyclist.apply_control(carla.VehicleControl(brake=1.0))
