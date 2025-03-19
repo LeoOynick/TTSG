@@ -174,7 +174,7 @@ class PedestrianManager:
                     )
                 if isinstance(destination, carla.Waypoint):
                     destination = destination.transform.location
-                walker_controller.set_destination(destination.transform.location)
+                walker_controller.set_destination(destination)
             self.walker_controller_list.append(walker_controller)
 
     def check_walker_spawn_type(self, waypoint, target_road_type=None):
