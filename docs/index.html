@@ -119,7 +119,8 @@
             <div class="column has-text-centered">
               <div class="publication-links">
                 <span class="link-block">
-                  <a href="http://arxiv.org/abs/2409.09575" target="_blank" class="external-link button is-normal is-rounded is-dark">
+                  <a href="http://arxiv.org/abs/2409.09575" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
                     <span class="icon">
                       <i class="ai ai-arxiv"></i>
                     </span>
@@ -173,21 +174,21 @@
           <h2 class="title is-3">Abstract</h2>
           <div class="content has-text-justified">
             <p>
-              In this work, we introduce a <strong>text-to-traffic scene framework</strong> that <strong>generates
-                diverse
-                traffic scenes within
-                the Carla simulator based on natural language descriptions with a large language model</strong>.
-              Existing methods
-              for text-to-scene generation often depend on generating critical scenarios along a few fixed paths, thus
-              greatly losing the diversity of the environment and limiting the flexibility of customization. In
-              contrast, our approach utilizes a common structured output format to enable the flexible generation of a
-              wide range of traffic scenarios. Users can specify various parameters such as weather conditions, vehicle
-              types, and road signals as one of the generation conditions. Importantly, our model does not require a
-              predetermined location or a trajectory. It can autonomously select the starting point and details of the
-              scenario based on the user's input to generate scenes from scratch. Additionally, our framework is capable
-              of generating not only critical scenarios but also everyday traffic scenes, enhancing its utility. We
-              demonstrate that our framework can provide diverse agent planning and road selection and can facilitate
-              the training of autonomous agents in critical traffic by achieving comparable or superior performance.
+              Generating realistic and controllable traffic scenes from natural language can greatly enhance the
+              development and evaluation of autonomous driving systems. However, this task poses unique challenges: (1)
+              grounding free-form text into spatially valid and semantically coherent layouts, (2) planning multi-agent
+              behaviors that respect legal and topological constraints, and (3) composing critical or sequential
+              scenarios without predefined locations. To address these, we propose a modular framework, TTSG, comprising
+              prompt analysis, road retrieval, agent planning, and a novel plan-aware road ranking algorithm to solve
+              these challenges. While large language models (LLMs) are used as general planners, our design integrates
+              them into a tightly controlled pipeline that enforces structure, feasibility, and scene diversity.
+              Notably, our ranking strategy ensures consistency between agent actions and road geometry, enabling scene
+              generation without predefined routes or spawn points. The framework supports both routine and
+              safety-critical scenarios, as well as multi-stage event composition. Experiments on SafeBench demonstrate
+              that our method achieves the lowest average collision rate (0.035) across three critical scenarios.
+              Moreover, driving captioning models trained on our generated scenes improve action reasoning by over 30
+              CIDEr points. These results underscore our proposed framework for flexible, interpretable, and
+              safety-oriented simulation.
             </p>
           </div>
         </div>
@@ -490,6 +491,37 @@
                   style="color: red;">ego car</span> is <span style="color: DodgerBlue;">turning right</span>.</p>
             </div>
           </div>
+          <h4 class="title is-4">Sequential Events</h4>
+          <div class="columns interpolation-panel">
+            <div class="column is-4 has-text-centered">
+              <video autoplay controls muted loop playsinline width="100%">
+                <source src="./static/videos/seq_event/front.mp4" type="video/mp4">
+              </video>
+              <video autoplay controls muted loop playsinline width="100%">
+                <source src="./static/videos/seq_event/bev.mp4" type="video/mp4">
+              </video>
+            </div>
+            <div class="column is-8" style="display: flex; flex-direction: column; justify-content: center;">
+              <div>
+                <h5 class="title is-6">Event 1</h5>
+                <p>The <span style="color: red;">ego car</span> is <span style="color: DodgerBlue;">turning left</span>
+                  at the intersection <span style="color: purple;">with no traffic light</span>,
+                  <span style="color: purple;">stop sign</span>, or <span style="color: purple;">stop sign on
+                    road</span>. A <span style="color: red;">car</span> <span style="color: MediumSeaGreen;">coming from
+                    the
+                    straight</span> is <span style="color: DodgerBlue;">going straight</span>.
+                </p>
+              </div>
+              <br />
+              <div>
+                <h5 class="title is-6">Event 2</h5>
+                <p>The <span style="color: red;">ego car</span> is being <span style="color: DodgerBlue;">blocked by
+                    two</span> <span style="color: red;">cars</span> <span style="color: MediumSeaGreen;">in
+                    front</span>.
+                </p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -561,7 +593,7 @@
                 <td class="best has-text-centered">0.021</td>
                 <td class="best has-text-centered">0.085</td>
                 <td style="border-right: 1px solid #dbdbdb;" class="best has-text-centered">0.000</td>
-                <td style="border-right: none !important;" class="best has-text-centered">0.067</td>
+                <td style="border-right: none !important;" class="best has-text-centered">0.035</td>
               </tr>
               <tr>
                 <th class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">LC
@@ -614,11 +646,55 @@
         </div>
       </div>
       <div class="content">
+        <h3 class="subtitle is-4">Caption Driving</h3>
+        <p>We demonstrate how our pipeline can be used for training captioning model under critical scenario. We report
+          the <i>"BLEU"</i> (B), <i>"METEOR"</i> (M), and <i>"CIDEr"</i> (C) for narration and reasoning.</p>
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th rowspan="2" colspan="1" class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;"></th>
+                <th colspan="3" class="has-text-centered">Narration</th>
+                <th colspan="3" class="has-text-centered" style="border-right: none !important;">Reasoning</th>
+              </tr>
+              <tr>
+                <td class="has-text-centered" style="border-right: none !important;">B</td>
+                <td class="has-text-centered">M</td>
+                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">C</td>
+                <td class="has-text-centered">B</td>
+                <td class="has-text-centered">M</td>
+                <td class="has-text-centered">C</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th class="has-text-centered">ADAPT <a href="#cite-5">[5]</a></th>
+                <td class="has-text-centered">4.8</td>
+                <td class="has-text-centered">13.5</td>
+                <td class="has-text-centered">15.2</td>
+                <td class="has-text-centered">0.0</td>
+                <td class="has-text-centered">10.0</td>
+                <td class="has-text-centered">18.4</td>
+              </tr>
+              <tr style="border-bottom: 1.5px solid #dbdbdb;">
+                <th class="has-text-centered">+ ours</th>
+                <td class="best has-text-centered">9.9</td>
+                <td class="best has-text-centered">18.4</td>
+                <td class="best has-text-centered">52.9</td>
+                <td class="best has-text-centered">7.2</td>
+                <td class="best has-text-centered">11.2</td>
+                <td class="best has-text-centered">51.9</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="content">
         <h3 class="subtitle is-4">Ablation Study</h3>
         <p>We evaluate the efficacy of framework components by generating ten distinct prompts, each tailored to
           test the components under diverse scenarios. These scenarios encompass three normal, four critical, and three
           specific road conditions, such as the presence of traffic lights or the absence of crossroads. "AA" represents
-          <i>"Agent Accuracy"</i>, "RA" represents <i>"Road Accuracy"</i>, and "TM" represents <i>"Text Matching"</i>.
+          <i>"Agent Accuracy"</i>, "RA" represents <i>"Road Accuracy"</i>, and "SA" represents <i>"Scene Accuracy"</i>.
           Prompts for the ablation study can be found in <a
             href="https://github.com/basiclab/TTSG/blob/main/misc/prompt_for_testing.py" target="_blank">here</a>.
         </p>
@@ -682,13 +758,13 @@
               <tr>
                 <th colspan="1" rowspan="1" class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">Scene
                   Quality</th>
-                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;" colspan="2">TM<span
+                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;" colspan="2">SA<span
                     style="font-size:small;">↥</span></td>
-                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;" colspan="2">TM<span
+                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;" colspan="2">SA<span
                     style="font-size:small;">↥</span></td>
-                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;" colspan="2">TM<span
+                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;" colspan="2">SA<span
                     style="font-size:small;">↥</span></td>
-                <td class="has-text-centered" style="border-right: none !important;" colspan="2">TM<span
+                <td class="has-text-centered" style="border-right: none !important;" colspan="2">SA<span
                     style="font-size:small;">↥</span></td>
               </tr>
               <tr>
@@ -720,17 +796,11 @@
           </table>
         </div>
       </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container is-max-desktop">
-      <h2 class="title is-3">Discussion</h2>
       <div class="content">
         <h3 class="subtitle is-4">Diversity Test</h3>
         <p> We provide a diversity test to evaluate the diversity of the generated traffic scenes. We make eight
           different scenes and test each scene five times. We report the <i>"Agent Diversity"</i> (AD), <i>"Road
-            Diversity"</i> (RD), and <i>"Text Matching"</i> (TM). Prompts for the diversity test can be found in <a
+            Diversity"</i> (RD), and <i>"Scene Accuracy"</i> (SA). Prompts for the diversity test can be found in <a
             href="https://github.com/basiclab/TTSG/tree/main/diversity_test" target="_blank">here</a>.
         <div class="table-container">
           <table class="table">
@@ -795,7 +865,7 @@
                 <td class="has-text-centered">0.975</td>
               </tr>
               <tr>
-                <th class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">TM<span
+                <th class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">SA<span
                     style="font-size:small;">↥</span></th>
                 <td class="has-text-centered">1.000</td>
                 <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">0.800</td>
@@ -811,65 +881,29 @@
 
           </table>
         </div>
-        <h3 class="subtitle is-4">Caption Driving</h3>
-        <p>We demonstrate how our pipeline can be used for training captioning model under critical scenario. We report the <i>"BLEU"</i> (B), <i>"METEOR"</i> (M), and <i>"CIDEr"</i> (C) for narration and reasoning.</p>
-        <div class="table-container">
-          <table class="table">
-            <thead>
-              <tr>
-                <th rowspan="2" colspan="1" class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;"></th>
-                <th colspan="3" class="has-text-centered" >Narration</th>
-                <th colspan="3" class="has-text-centered" style="border-right: none !important;">Reasoning</th>
-              </tr>
-              <tr>
-                <td class="has-text-centered" style="border-right: none !important;">B</td>
-                <td class="has-text-centered">M</td>
-                <td class="has-text-centered" style="border-right: 1.5px solid #dbdbdb;">C</td>
-                <td class="has-text-centered">B</td>
-                <td class="has-text-centered">M</td>
-                <td class="has-text-centered">C</td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <th class="has-text-centered">original</th>
-                <td class="has-text-centered">4.8</td>
-                <td class="has-text-centered">13.5</td>
-                <td class="has-text-centered">15.2</td>
-                <td class="has-text-centered">0.0</td>
-                <td class="has-text-centered">10.0</td>
-                <td class="has-text-centered">18.4</td>
-              </tr>
-              <tr style="border-bottom: 1.5px solid #dbdbdb;">
-                <th class="has-text-centered">finetuned</th>
-                <td class="best has-text-centered">9.9</td>
-                <td class="best has-text-centered">18.4</td>
-                <td class="best has-text-centered">52.9</td>
-                <td class="best has-text-centered">7.2</td>
-                <td class="best has-text-centered">11.2</td>
-                <td class="best has-text-centered">51.9</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
       </div>
     </div>
   </section>
+
+
   <section class="section" id="BibTeX">
     <div class="container is-max-desktop content">
       <h2 class="title">Reference</h2>
-      <p id="cite-1">[1] W. Ding, B. Chen, M. Xu, and D. Zhao, “Learning to collide: An adaptive safety-critical
+      <p id="cite-1">[1] W. Ding, B. Chen, M. Xu, and D. Zhao, "Learning to collide: An adaptive safety-critical
         scenarios generating
-        method,” in IEEE/RSJ International Conference on Intelligent Robots and Systems, 2020, pp. 2243–2250.</p>
-      <p id="cite-2">[2] J. Wang, A. Pun, J. Tu, S. Manivasagam, A. Sadat, S. Casas, M. Ren, and R. Urtasun, “Advsim:
-        Generating safety-critical scenarios for self-driving vehicles,” in Proceedings of the IEEE/CVF Conference on
+        method," in IEEE/RSJ International Conference on Intelligent Robots and Systems, 2020, pp. 2243–2250.</p>
+      <p id="cite-2">[2] J. Wang, A. Pun, J. Tu, S. Manivasagam, A. Sadat, S. Casas, M. Ren, and R. Urtasun, "Advsim:
+        Generating safety-critical scenarios for self-driving vehicles," in Proceedings of the IEEE/CVF Conference on
         Computer Vision and Pattern Recognition, 2021, pp. 9909–9918</p>
-      <p id="cite-3">[3] J. Zhang, C. Xu, and B. Li, “Chatscene: Knowledge-enabled safety-critical scenario generation
-        for autonomous vehicles,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition,
+      <p id="cite-3">[3] J. Zhang, C. Xu, and B. Li, "Chatscene: Knowledge-enabled safety-critical scenario generation
+        for autonomous vehicles," in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition,
         2024, pp. 15 459-15 469.</p>
-      <p id="cite-4">[4] Q. Zhang, S. Hu, J. Sun, Q. A. Chen, and Z. M. Mao, “On adversarial robustness of trajectory
-        prediction for autonomous vehicles,” in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern
+      <p id="cite-4">[4] Q. Zhang, S. Hu, J. Sun, Q. A. Chen, and Z. M. Mao, "On adversarial robustness of trajectory
+        prediction for autonomous vehicles," in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern
         Recognition, 2022, pp. 15 159–15 168.</p>
+      <p id="cite-5">[5] Jin, B., Liu, X., Zheng, Y., Li, P., Zhao, H., Zhang, T., ... & Liu, J. "ADAPT:
+        Action-aware Driving Caption Transformer". In International Conference on Robotics and Automation
+        , 2023, pp. 7554-7561.</p>
     </div>
   </section>
 

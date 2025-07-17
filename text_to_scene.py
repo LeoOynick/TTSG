@@ -1,7 +1,6 @@
 import argparse
 import json
 import os
-import random
 
 import dotenv
 import numpy as np
@@ -29,6 +28,18 @@ dotenv.load_dotenv()
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Text to scene")
+    parser.add_argument(
+        "--use-seed",
+        action="store_true",
+        help="Use seed",
+        default=False,
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="The seed",
+    )
     parser.add_argument(
         "--input-prompt",
         type=str,
@@ -263,7 +274,9 @@ def text_to_scene(
 
 if __name__ == "__main__":
     args = parse_args()
-    # create_seed()
+    if args.use_seed:
+        create_seed(args.seed)
+
     text_to_scene(
         input_prompt=args.input_prompt,
         model_name=args.model_name,

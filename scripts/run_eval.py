@@ -41,12 +41,20 @@ if __name__ == "__main__":
     parser.add_argument("--max_episode_step", type=int, default=300)
     parser.add_argument("--auto_ego", action="store_true")
     parser.add_argument(
-        "--mode", "-m", type=str, default="eval", choices=["train_agent", "train_scenario", "eval"]
+        "--mode",
+        "-m",
+        type=str,
+        default="eval",
+        choices=["train_agent", "train_scenario", "eval"],
     )
     parser.add_argument("--agent_cfg", nargs="*", type=str, default=["adv_scenic.yaml"])
-    parser.add_argument("--scenario_cfg", nargs="*", type=str, default=["eval_scenic.yaml"])
+    parser.add_argument(
+        "--scenario_cfg", nargs="*", type=str, default=["eval_scenic.yaml"]
+    )
     parser.add_argument("--continue_agent_training", "-cat", type=bool, default=False)
-    parser.add_argument("--continue_scenario_training", "-cst", type=bool, default=False)
+    parser.add_argument(
+        "--continue_scenario_training", "-cst", type=bool, default=False
+    )
 
     parser.add_argument("--seed", "-s", type=int, default=0)
     parser.add_argument("--threads", type=int, default=4)
@@ -55,15 +63,23 @@ if __name__ == "__main__":
     )
 
     parser.add_argument(
-        "--num_scenario", "-ns", type=int, default=2, help="num of scenarios we run in one episode"
+        "--num_scenario",
+        "-ns",
+        type=int,
+        default=2,
+        help="num of scenarios we run in one episode",
     )
     parser.add_argument("--save_video", action="store_true")
     parser.add_argument("--render", type=bool, default=True)
     parser.add_argument(
         "--frame_skip", "-fs", type=int, default=1, help="skip of frame in each step"
     )
-    parser.add_argument("--port", type=int, default=2000, help="port to communicate with carla")
-    parser.add_argument("--tm_port", type=int, default=8000, help="traffic manager port")
+    parser.add_argument(
+        "--port", type=int, default=2000, help="port to communicate with carla"
+    )
+    parser.add_argument(
+        "--tm_port", type=int, default=8000, help="traffic manager port"
+    )
     parser.add_argument("--fixed_delta_seconds", type=float, default=0.1)
     parser.add_argument("--test_policy", type=str, default="sac")
     parser.add_argument("--route_id", type=int, default=0)
@@ -80,7 +96,9 @@ if __name__ == "__main__":
             set_seed(args.seed)
 
             # load agent config
-            agent_config_path = osp.join(args.ROOT_DIR, "safebench/agent/config", agent_cfg)
+            agent_config_path = osp.join(
+                args.ROOT_DIR, "safebench/agent/config", agent_cfg
+            )
             agent_config = load_config(agent_config_path)
             agent_config["policy_name"] = args.test_policy
 
@@ -110,10 +128,18 @@ if __name__ == "__main__":
             agent_config.update(args_dict)
             print(agent_config["load_dir"])
             scenario_config.update(args_dict)
-            if scenario_config["policy_type"] == "scenic":
+            if scenario_config["policy_type"] == "text_to_scene":
+                from safebench.text_to_scene_runner import TextToSceneRunner
+
+                scenario_config["num_scenario"] = 1
+                scenario_config["route_id"] = [args.route_id + 4]
+                runner = TextToSceneRunner(agent_config, scenario_config)
+            elif scenario_config["policy_type"] == "scenic":
                 from safebench.scenic_runner import ScenicRunner
 
-                scenario_config["num_scenario"] = 1  # 'the num_scenario can only be one for scenic'
+                scenario_config["num_scenario"] = (
+                    1  # 'the num_scenario can only be one for scenic'
+                )
                 scenario_config["route_id"] = [args.route_id]
                 runner = ScenicRunner(agent_config, scenario_config)
             else:

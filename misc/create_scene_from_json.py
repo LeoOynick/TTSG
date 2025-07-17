@@ -28,6 +28,18 @@ def create_seed(seed=42):
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Create scene from json file")
+    parser.add_argument(
+        "--use-seed",
+        action="store_true",
+        help="Use seed",
+        default=False,
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=42,
+        help="The seed",
+    )
     parser.add_argument("--json-file", type=str, help="Path to json file")
     parser.add_argument(
         "--map-folder",
@@ -154,7 +166,10 @@ if __name__ == "__main__":
     args = parse_args()
     with open(args.json_file, "r") as f:
         data = json.load(f)
-    # create_seed()
+
+    if args.use_seed:
+        create_seed(args.seed)
+
     scene_generation(
         data["retreival"],
         data["planning"],

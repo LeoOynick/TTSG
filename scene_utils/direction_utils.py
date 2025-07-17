@@ -165,24 +165,6 @@ def check_direction_and_sample_correct_point(
 
     return return_dict
 
-    # if is_correct:
-    #     return direction, get_correct_lane_driving(
-    #         right_driving_points if choose_right else left_driving_points,
-    #         "right" if choose_right else "left",
-    #         direction,
-    #     )
-    # else:
-    #     choose_left = choose_right
-    #     if (choose_left and len(left_driving_points) == 0) or (
-    #         not choose_left and len(right_driving_points) == 0
-    #     ):
-    #         return direction, None
-    #     return direction, get_correct_lane_driving(
-    #         left_driving_points if choose_left else right_driving_points,
-    #         "left" if choose_left else "right",
-    #         direction,
-    #     )
-
 
 def get_points_to_front(waypoint: carla.Waypoint, distance: float = DISTANCE_FOR_ROUTE):
     return waypoint.next_until_lane_end(distance)

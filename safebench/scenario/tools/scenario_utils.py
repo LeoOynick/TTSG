@@ -1,7 +1,7 @@
-""" 
+"""
 Date: 2023-01-31 22:23:17
 LastEditTime: 2023-04-03 19:26:20
-Description: 
+Description:
     Copyright (c) 2022-2023 Safebench Team
 
     This file is modified from <https://github.com/carla-simulator/scenario_runner/tree/master/srunner/tools>
@@ -66,17 +66,29 @@ def scenario_parse(config, logger):
         # filter the list if any parameter is specified
         if config["scenario_id"] is not None:
             logger.log(">> Selecting scenario_id: " + str(config["scenario_id"]))
-            data_full = [item for item in data_full if item["scenario_id"] == config["scenario_id"]]
+            data_full = [
+                item
+                for item in data_full
+                if item["scenario_id"] == config["scenario_id"]
+            ]
         if config["route_id"] is not None:
             logger.log(">> Selecting route_id: " + str(config["route_id"]))
-            data_full = [item for item in data_full if item["route_id"] == config["route_id"]]
+            data_full = [
+                item for item in data_full if item["route_id"] == config["route_id"]
+            ]
 
     ### different mapping between v1 and v2 ###
     if config["mode"] == "train_agent":
-        data_full = [item for item in data_full if item["route_id"] >= 4 and item["route_id"] < 12]
+        data_full = [
+            item
+            for item in data_full
+            if item["route_id"] >= 4 and item["route_id"] < 12
+        ]
 
     logger.log(f">> Loading {len(data_full)} data")
-    data_full = [item for item in data_full if item["data_id"] not in logger.eval_records.keys()]
+    data_full = [
+        item for item in data_full if item["data_id"] not in logger.eval_records.keys()
+    ]
     logger.log(f">> Parsing {len(data_full)} unfinished data")
 
     config_by_map = {}
@@ -143,7 +155,9 @@ def scenic_parse(config, logger):
             ]
         )
         scenic_rel_listdir.extend(new_files)
-        scenic_abs_listdir.extend(osp.join(current_scenic_dir, path) for path in new_files)
+        scenic_abs_listdir.extend(
+            osp.join(current_scenic_dir, path) for path in new_files
+        )
         scenario_ids.extend([j] * len(new_files))
 
     behaviors = [path.split(".")[0] for path in scenic_rel_listdir]
@@ -173,7 +187,9 @@ def scenic_parse(config, logger):
 
         current_scenic_dir = osp.join(scenic_dir, f"scenario_{scenario_ids[i]}")
         try:
-            params_dir = open(osp.join(current_scenic_dir, f"scenario_{scenario_ids[i]}.json"))
+            params_dir = open(
+                osp.join(current_scenic_dir, f"scenario_{scenario_ids[i]}.json")
+            )
             params = json.load(params_dir)
         except:
             params = {}
@@ -200,7 +216,9 @@ def scenic_parse(config, logger):
             for j in route:
                 updated_config = deepcopy(parsed_config)
                 updated_config.route_id = j
-                data = data_full[f"scenario_id_{updated_config.scenario_id}_route_id_{j}"]
+                data = data_full[
+                    f"scenario_id_{updated_config.scenario_id}_route_id_{j}"
+                ]
                 updated_config.trajectory = data["trajectory"]
                 updated_config.extra_params["town"] = data["town"]
                 updated_config.extra_params["weather"] = data["weather"]
@@ -213,7 +231,9 @@ def scenic_parse(config, logger):
 
                 if mode in ["eval", "train_agent"]:
                     try:
-                        updated_config.opt_params = params[f"OPT_{behaviors[i]}_ROUTE-{j}"]
+                        updated_config.opt_params = params[
+                            f"OPT_{behaviors[i]}_ROUTE-{j}"
+                        ]
                     except:
                         continue
                 else:
@@ -264,11 +284,14 @@ def json_parse(config, logger):
             [
                 os.path.join(path, "agent_output.json")
                 for path in os.listdir(current_scenic_dir)
-                if path.endswith("json") and os.path.isdir(os.path.join(current_scenic_dir, path))
+                if path.endswith("json")
+                and os.path.isdir(os.path.join(current_scenic_dir, path))
             ]
         )
         scenic_rel_listdir.extend(new_files)
-        scenic_abs_listdir.extend(osp.join(current_scenic_dir, path) for path in new_files)
+        scenic_abs_listdir.extend(
+            osp.join(current_scenic_dir, path) for path in new_files
+        )
         scenario_ids.extend([j] * len(new_files))
 
     behaviors = [os.path.dirname(path).rsplit("_", 1)[0] for path in scenic_rel_listdir]
@@ -276,7 +299,9 @@ def json_parse(config, logger):
 
     config_list = []
     for i, scenic_file in enumerate(scenic_abs_listdir):
-        params_dir = open(osp.join(current_scenic_dir, f"scenario_{scenario_ids[i]}.json"))
+        params_dir = open(
+            osp.join(current_scenic_dir, f"scenario_{scenario_ids[i]}.json")
+        )
         params = json.load(params_dir)
         for route_id in config["route_id"]:
             route_file = route_file_formatter % (
@@ -299,7 +324,10 @@ def json_parse(config, logger):
             parsed_config.scenario_id = config["scenario_id"]
             parsed_config.route_id = route_id
             parsed_config.mode = config["mode"]
-            parsed_config.opt_params = params[f"OPT_{behaviors[i]}_ROUTE-{route_id - 4}"]
+            parsed_config.opt_step = config["opt_step"]
+            parsed_config.opt_params = params[
+                f"OPT_{behaviors[i]}_ROUTE-{route_id - 4}"
+            ]
 
             parsed_config.json_file = scenic_file
             parsed_config.behavior = behaviors[i]
@@ -332,7 +360,9 @@ def dynamic_scenic_parse(config, logger):
     scenic_rel_listdir = []
     scenic_abs_listdir = []
 
-    new_files = sorted([path for path in os.listdir(scenic_dir) if path.split(".")[1] == "scenic"])
+    new_files = sorted(
+        [path for path in os.listdir(scenic_dir) if path.split(".")[1] == "scenic"]
+    )
     scenic_rel_listdir = new_files
     scenic_abs_listdir = [osp.join(scenic_dir, path) for path in new_files]
 
@@ -380,7 +410,9 @@ def get_valid_spawn_points(world):
     vehicle_spawn_points = list(world.get_map().get_spawn_points())
     random.shuffle(vehicle_spawn_points)
     actor_location_list = get_current_location_list(world)
-    vehicle_spawn_points = filter_valid_spawn_points(vehicle_spawn_points, actor_location_list)
+    vehicle_spawn_points = filter_valid_spawn_points(
+        vehicle_spawn_points, actor_location_list
+    )
     return vehicle_spawn_points
 
 
@@ -427,14 +459,16 @@ def compare_scenarios(scenario_choice, existent_scenario):
     existent_vec = transform_to_pos_vec(existent_scenario)
     for pos_choice in choice_vec:
         for pos_existent in existent_vec:
-
             dx = float(pos_choice["x"]) - float(pos_existent["x"])
             dy = float(pos_choice["y"]) - float(pos_existent["y"])
             dz = float(pos_choice["z"]) - float(pos_existent["z"])
             dist_position = math.sqrt(dx * dx + dy * dy + dz * dz)
             dyaw = float(pos_choice["yaw"]) - float(pos_choice["yaw"])
             dist_angle = math.sqrt(dyaw * dyaw)
-            if dist_position < TRIGGER_THRESHOLD and dist_angle < TRIGGER_ANGLE_THRESHOLD:
+            if (
+                dist_position < TRIGGER_THRESHOLD
+                and dist_angle < TRIGGER_ANGLE_THRESHOLD
+            ):
                 return True
     return False
 

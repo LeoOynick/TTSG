@@ -123,7 +123,9 @@ class TextToSceneRunner:
                 "yellow",
             )
         if scenario_config["policy_type"] == "ordinary" and self.mode != "train_agent":
-            self.logger.log(">> Ordinary scenario can only be used in agent training", "red")
+            self.logger.log(
+                ">> Ordinary scenario can only be used in agent training", "red"
+            )
             raise Exception()
         self.logger.log(">> " + "-" * 40)
 
@@ -150,7 +152,9 @@ class TextToSceneRunner:
         CarlaDataProvider.set_traffic_manager_port(self.scenario_config["tm_port"])
 
     def _init_client(self, config):
-        self.logger.log(f">> Initializing carla client with config file: {config.json_file}")
+        self.logger.log(
+            f">> Initializing carla client with config file: {config.json_file}"
+        )
         # The json file will be one of the behavior config file (e.g., behavior_1_opt.json)
         carla_client = CarlaClient()
         carla_client.set_world(self.world)
@@ -182,7 +186,9 @@ class TextToSceneRunner:
         self.display = pygame.display.set_mode(window_size, flag)
 
         # initialize the render for generating observation and visualization
-        pixels_per_meter = self.env_params["display_size"] / self.env_params["obs_range"]
+        pixels_per_meter = (
+            self.env_params["display_size"] / self.env_params["obs_range"]
+        )
         pixels_ahead_vehicle = (
             self.env_params["obs_range"] / 2 - self.env_params["d_behind"]
         ) * pixels_per_meter
@@ -194,15 +200,9 @@ class TextToSceneRunner:
             "pixels_per_meter": pixels_per_meter,
             "pixels_ahead_vehicle": pixels_ahead_vehicle,
         }
-        self.birdeye_render = BirdeyeRender(self.world, self.birdeye_params, logger=self.logger)
-
-    def run_scenes(self, scenes):
-        self.logger.log(">> Begin to run the scene...")
-        # currently there is only one scene in this list #
-        for scene in scenes:
-            if self.scenic.setSimulation(scene):
-                self.scenic.update_behavior = self.scenic.runSimulation()
-                next(self.scenic.update_behavior)
+        self.birdeye_render = BirdeyeRender(
+            self.world, self.birdeye_params, logger=self.logger
+        )
 
     def train(self, data_loader, start_episode=0, replay_buffer=None):
         # general buffer for both agent and scenario
@@ -219,7 +219,9 @@ class TextToSceneRunner:
             # get static obs and then reset with init action
             static_obs = self.env.get_static_obs(sampled_scenario_configs)
             self.scenario_policy.load_model(sampled_scenario_configs)
-            scenario_init_action, additional_dict = self.scenario_policy.get_init_action(static_obs)
+            scenario_init_action, additional_dict = (
+                self.scenario_policy.get_init_action(static_obs)
+            )
             obs, infos = self.env.reset(sampled_scenario_configs, scenario_init_action)
             replay_buffer.store_init(
                 [static_obs, scenario_init_action], additional_dict=additional_dict
@@ -242,8 +244,12 @@ class TextToSceneRunner:
             episode_reward = []
             while not self.env.all_scenario_done():
                 # get action from agent policy and scenario policy (assume using one batch)
-                ego_actions = self.agent_policy.get_action(obs, infos, deterministic=False)
-                scenario_actions = self.scenario_policy.get_action(obs, infos, deterministic=False)
+                ego_actions = self.agent_policy.get_action(
+                    obs, infos, deterministic=False
+                )
+                scenario_actions = self.scenario_policy.get_action(
+                    obs, infos, deterministic=False
+                )
 
                 # apply action to env and get obs
                 carla_client.check_finish(tick_world=False)
@@ -260,7 +266,10 @@ class TextToSceneRunner:
             # train off-policy agent or scenario
             if self.mode == "train_agent" and self.agent_policy.type == "offpolicy":
                 loss = self.agent_policy.train(replay_buffer)
-            elif self.mode == "train_scenario" and self.scenario_policy.type == "offpolicy":
+            elif (
+                self.mode == "train_scenario"
+                and self.scenario_policy.type == "offpolicy"
+            ):
                 self.scenario_policy.train(replay_buffer)
 
             score_function = (
@@ -315,30 +324,21 @@ class TextToSceneRunner:
         num_finished_scenario = 0
         data_loader.reset_idx_counter()
         # recording the score and the id of corresponding selected scenes
-        map_id_score = {}
         behavior_name = data_loader.behavior
         route_id = data_loader.route_id
-        opt_step = data_loader.opt_step
-        opt_time = 0
 
         if route_id is None:
             log_name = f"OPT_{behavior_name}"
         else:
-            log_name = f"OPT_{behavior_name}_ROUTE-{route_id}"
-
-        if select:
-            self.scene_map[log_name] = {}
-            self.scene_map[log_name][f"opt_time_{opt_time}"] = self.scenic.save_params()
+            log_name = f"OPT_{behavior_name}_ROUTE-{route_id - 4}"
 
         while len(data_loader) > 0:
             # sample scenarios
             sampled_scenario_configs, num_sampled_scenario = data_loader.sampler()
             num_finished_scenario += num_sampled_scenario
-            assert num_sampled_scenario == 1, "scenic can only run one scene at one time"
-
-            scenes = [config.scene for config in sampled_scenario_configs]
-            # begin to run the scene
-            self.run_scenes(scenes)
+            assert num_sampled_scenario == 1, (
+                "scenic can only run one scene at one time"
+            )
 
             # reset envs with new config, get init action from scenario policy, and run scenario
             static_obs = self.env.get_static_obs(sampled_scenario_configs)
@@ -351,13 +351,28 @@ class TextToSceneRunner:
             # get ego vehicle from scenario
             self.agent_policy.set_ego_and_route(self.env.get_ego_vehicles(), infos)
 
+            carla_client = self._init_client(sampled_scenario_configs[0])
+            carla_client.set_seed()
+            carla_client.spawn_all_agent(
+                None,
+                sampled_scenario_configs[0].llm_planning["planning"]["agents"],
+                None,
+                ego_agents=self.env.get_ego_vehicles()[0],
+                ego_destination=sampled_scenario_configs[0].llm_planning["destination"],
+            )
+
             score_list = {s_i: [] for s_i in range(num_sampled_scenario)}
             while not self.env.all_scenario_done():
                 # get action from agent policy and scenario policy (assume using one batch)
-                ego_actions = self.agent_policy.get_action(obs, infos, deterministic=True)
-                scenario_actions = self.scenario_policy.get_action(obs, infos, deterministic=True)
+                ego_actions = self.agent_policy.get_action(
+                    obs, infos, deterministic=True
+                )
+                scenario_actions = self.scenario_policy.get_action(
+                    obs, infos, deterministic=True
+                )
 
                 # apply action to env and get obs
+                carla_client.check_finish(tick_world=False)
                 obs, rewards, _, infos = self.env.step(
                     ego_actions=ego_actions, scenario_actions=scenario_actions
                 )
@@ -388,6 +403,7 @@ class TextToSceneRunner:
                     reward_idx += 1
 
             # clean up all things
+            carla_client.destroy(set_sync=False)
             self.logger.log(">> All scenarios are completed. Clearning up all actors")
             self.env.clean_up()
 
@@ -413,20 +429,14 @@ class TextToSceneRunner:
                 if self.scenario_category in ["planning", "scenic"]
                 else get_perception_scores
             )
-            all_running_results = self.logger.add_eval_results(records=self.env.running_results)
+            all_running_results = self.logger.add_eval_results(
+                records=self.env.running_results
+            )
             all_scores = score_function(all_running_results)
             self.logger.add_eval_results(scores=all_scores)
             self.logger.print_eval_results()
             if len(self.env.running_results) % self.save_freq == 0:
                 self.logger.save_eval_results(log_name)
-
-            if infos[0]["collision"]:
-                self.scenic.record_params()
-            if select and (num_finished_scenario % opt_step == 0):
-                opt_time += 1
-                self.scenic.update_params()
-                self.scene_map[log_name][f"opt_time_{opt_time}"] = self.scenic.save_params()
-                data_loader.train_scene(opt_time)
 
         self.logger.save_eval_results(log_name)
 
@@ -437,7 +447,6 @@ class TextToSceneRunner:
             self.dump_scene_map(sampled_scenario_configs[0].scenario_id)
 
         self.logger.clear()
-        self.scenic.destroy()
 
     def select_adv_scene(self, results, score_function, select_num):
         # define your own selection mechanism here
@@ -451,13 +460,17 @@ class TextToSceneRunner:
                 map_id_score_non_collision[i] = score["final_score"]
 
         # Sort the collision scenes by their scores
-        collision_scenes_sorted = sorted(map_id_score_collision.items(), key=lambda x: x[1])
+        collision_scenes_sorted = sorted(
+            map_id_score_collision.items(), key=lambda x: x[1]
+        )
 
         # Get the number of scenes to select from the collision cases
         num_collision_selected = min(select_num, len(collision_scenes_sorted))
 
         # Select the lowest scored scenes with collision
-        selected_scene_id = [scene[0] for scene in collision_scenes_sorted[:num_collision_selected]]
+        selected_scene_id = [
+            scene[0] for scene in collision_scenes_sorted[:num_collision_selected]
+        ]
 
         # If not enough collision scenes, select remaining scenes
         num_non_collision_selected = select_num - num_collision_selected
@@ -468,7 +481,12 @@ class TextToSceneRunner:
             )
             # Select the lowest scored scenes from the non-collision cases
             selected_scene_id.extend(
-                [scene[0] for scene in non_collision_scenes_sorted[:num_non_collision_selected]]
+                [
+                    scene[0]
+                    for scene in non_collision_scenes_sorted[
+                        :num_non_collision_selected
+                    ]
+                ]
             )
         return sorted(selected_scene_id)
 
@@ -495,7 +513,9 @@ class TextToSceneRunner:
             # check if resume #
             if self.continue_agent_training:
                 self.logger.load_training_results()
-                start_episode = self.check_continue_training(self.agent_policy, replay_buffer) + 1
+                start_episode = (
+                    self.check_continue_training(self.agent_policy, replay_buffer) + 1
+                )
                 if start_episode >= self.train_episode:
                     return
             else:
@@ -508,12 +528,11 @@ class TextToSceneRunner:
 
         last_town = None
         for config in config_list:
-
             # set log name #
             if config.route_id is None:
                 log_name = f"OPT_{config.behavior}"
             else:
-                log_name = f"OPT_{config.behavior}_ROUTE-{config.route_id}"
+                log_name = f"OPT_{config.behavior}_ROUTE-{config.route_id - 4}"
 
             # check if all done #
             if self.mode == "eval":
@@ -582,7 +601,9 @@ class TextToSceneRunner:
 
     def dump_scene_map(self, scenario_id):
         # load previous checkpoint
-        scenic_dir = os.path.join(self.scenario_config["scenic_dir"], f"scenario_{scenario_id}")
+        scenic_dir = os.path.join(
+            self.scenario_config["scenic_dir"], f"scenario_{scenario_id}"
+        )
         f = open(os.path.join(scenic_dir, f"{scenic_dir.split('/')[-1]}.json"), "w")
         json_dumps_str = json.dumps(self.scene_map, indent=4)
         print(json_dumps_str, file=f)
@@ -590,9 +611,13 @@ class TextToSceneRunner:
 
     def load_scene_map(self, scenario_id):
         # load previous checkpoint
-        scenic_dir = os.path.join(self.scenario_config["scenic_dir"], f"scenario_{scenario_id}")
+        scenic_dir = os.path.join(
+            self.scenario_config["scenic_dir"], f"scenario_{scenario_id}"
+        )
         try:
-            with open(os.path.join(scenic_dir, f"{scenic_dir.split('/')[-1]}.json"), "r") as f:
+            with open(
+                os.path.join(scenic_dir, f"{scenic_dir.split('/')[-1]}.json"), "r"
+            ) as f:
                 data = json.loads(f.read())
         except:
             data = {}
