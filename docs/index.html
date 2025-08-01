@@ -176,19 +176,18 @@
             <p>
               Generating realistic and controllable traffic scenes from natural language can greatly enhance the
               development and evaluation of autonomous driving systems. However, this task poses unique challenges: (1)
-              grounding free-form text into spatially valid and semantically coherent layouts, (2) planning multi-agent
-              behaviors that respect legal and topological constraints, and (3) composing critical or sequential
-              scenarios without predefined locations. To address these, we propose a modular framework, TTSG, comprising
-              prompt analysis, road retrieval, agent planning, and a novel plan-aware road ranking algorithm to solve
-              these challenges. While large language models (LLMs) are used as general planners, our design integrates
-              them into a tightly controlled pipeline that enforces structure, feasibility, and scene diversity.
-              Notably, our ranking strategy ensures consistency between agent actions and road geometry, enabling scene
-              generation without predefined routes or spawn points. The framework supports both routine and
-              safety-critical scenarios, as well as multi-stage event composition. Experiments on SafeBench demonstrate
-              that our method achieves the lowest average collision rate (0.035) across three critical scenarios.
-              Moreover, driving captioning models trained on our generated scenes improve action reasoning by over 30
-              CIDEr points. These results underscore our proposed framework for flexible, interpretable, and
-              safety-oriented simulation.
+              grounding free-form text into spatially valid and semantically coherent layouts, (2) composing scenarios
+              without predefined locations, and (3) planning multi-agent behaviors and selecting roads that respect
+              agents' configurations. To address these, we propose a modular framework, TTSG, comprising prompt
+              analysis, road retrieval, agent planning, and a novel plan-aware road ranking algorithm to solve these
+              challenges. While large language models (LLMs) are used as general planners, our design integrates them
+              into a tightly controlled pipeline that enforces structure, feasibility, and scene diversity. Notably, our
+              ranking strategy ensures consistency between agent actions and road geometry, enabling scene generation
+              without predefined routes or spawn points. The framework supports both routine and safety-critical
+              scenarios, as well as multi-stage event composition. Experiments on SafeBench demonstrate that our method
+              achieves the lowest average collision rate (3.5%) across three critical scenarios. Moreover, driving
+              captioning models trained on our generated scenes improve action reasoning by over 30 CIDEr points. These
+              results underscore our proposed framework for flexible, interpretable, and safety-oriented simulation.
             </p>
           </div>
         </div>

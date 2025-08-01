@@ -54,6 +54,7 @@ class VehicleManager:
         graph_manager: GraphManager,
         agent_model_manager: Optional[AgentModelManager] = None,
         world_manager: Optional[WorldManager] = None,
+        override_option: bool = False,
     ):
         self.graph_manager = graph_manager
         self.agent_model_manager = agent_model_manager
@@ -69,7 +70,11 @@ class VehicleManager:
         self.front_pos_id_to_waypoint = {}
         self.back_pos_id_to_waypoint = {}
 
-    def set_new_manager(self, agent_model_manager: AgentModelManager, world_manager: WorldManager):
+        self.override_option = override_option
+
+    def set_new_manager(
+        self, agent_model_manager: AgentModelManager, world_manager: WorldManager
+    ):
         self.agent_model_manager = agent_model_manager
         self.world_manager = world_manager
 
@@ -124,11 +129,15 @@ class VehicleManager:
             if len(direction_dict) == 0:
                 continue
             direction_to_point.update(direction_dict)
-            direction_to_road_id.update({direction: road_id for direction in direction_dict})
+            direction_to_road_id.update(
+                {direction: road_id for direction in direction_dict}
+            )
 
         return direction_to_road_id if get_road_id_only else direction_to_point
 
-    def set_vehicle_agent_action(self, agent: BehaviorAgent, action, info, num_interpolate=10):
+    def set_vehicle_agent_action(
+        self, agent: BehaviorAgent, action, info, num_interpolate=10
+    ):
         go_left_straight_right = self.get_left_straight_right(
             self.world_manager.get_waypoint_from_location(
                 location=agent._vehicle.get_location(),
@@ -141,20 +150,28 @@ class VehicleManager:
         elif action == "change_lane_to_right":
             agent.lane_change("right")
         elif action == "go_straight" and "can_straight" in go_left_straight_right:
-            agent.set_destination(go_left_straight_right["can_straight"].transform.location)
+            agent.set_destination(
+                go_left_straight_right["can_straight"].transform.location
+            )
         elif action == "turn_left":
             if "can_left" in go_left_straight_right:
-                agent.set_destination(go_left_straight_right["can_left"].transform.location)
+                agent.set_destination(
+                    go_left_straight_right["can_left"].transform.location
+                )
             else:
                 agent.lane_change("left")
         elif action == "turn_right":
             if "can_right" in go_left_straight_right:
-                agent.set_destination(go_left_straight_right["can_right"].transform.location)
+                agent.set_destination(
+                    go_left_straight_right["can_right"].transform.location
+                )
             else:
                 agent.lane_change("right")
         elif action == "block_the_ego":
             # Set the same location as the ego vehicle
-            destination = self.vehicle_agent[0].destination_waypoint.next(DISTANCE_FOR_ROUTE * 5)[0]
+            destination = self.vehicle_agent[0].destination_waypoint.next(
+                DISTANCE_FOR_ROUTE * 5
+            )[0]
             agent.set_destination(
                 destination.transform.location,
                 interfere_target=self.vehicle_agent[0],
@@ -173,12 +190,15 @@ class VehicleManager:
                 | carla.LaneType.Sidewalk,
             )
             single_vector = (
-                np.array(make_vector(current_spawn_point, destination)) / num_interpolate
+                np.array(make_vector(current_spawn_point, destination))
+                / num_interpolate
             )
             interpolate = [
                 [
-                    current_spawn_point.transform.location.x + single_vector[0] * point_idx,
-                    current_spawn_point.transform.location.y + single_vector[1] * point_idx,
+                    current_spawn_point.transform.location.x
+                    + single_vector[0] * point_idx,
+                    current_spawn_point.transform.location.y
+                    + single_vector[1] * point_idx,
                 ]
                 for point_idx in range(1, num_interpolate)
             ]
@@ -221,7 +241,9 @@ class VehicleManager:
         self.set_vehicle_agent_action(agent, agent_info["action"], agent_info)
         return agent
 
-    def add_pre_spawn_ego(self, ego_vehicle, ego_waypoint, agent_info, destination=None):
+    def add_pre_spawn_ego(
+        self, ego_vehicle, ego_waypoint, agent_info, destination=None
+    ):
         self.vehicles.append(ego_vehicle)
         agent = BehaviorAgent(ego_vehicle)
         if destination is None:
@@ -243,7 +265,9 @@ class VehicleManager:
         )
         min_idx = min(
             range(len(driving_points)),
-            key=lambda x: driving_points[x].transform.location.distance(ego_vehicle.get_location()),
+            key=lambda x: driving_points[x].transform.location.distance(
+                ego_vehicle.get_location()
+            ),
         )
 
         self.points_to_front = driving_points[:min_idx]
@@ -251,13 +275,18 @@ class VehicleManager:
         self.front_required = self.count_points_required("front", agent_info)
         self.back_required = self.count_points_required("back", agent_info)
 
-    def spawn_car(self, spawn_point, model: str = "vehicle.lincoln.mkz_2017", agent_info=None):
+    def spawn_car(
+        self, spawn_point, model: str = "vehicle.lincoln.mkz_2017", agent_info=None
+    ):
         if model == "random":
-            ego_vehicle_bp = self.agent_model_manager.get_blueprint_from_type(agent_info["type"])
+            ego_vehicle_bp = self.agent_model_manager.get_blueprint_from_type(
+                agent_info["type"]
+            )
         else:
             ego_vehicle_bp = self.agent_model_manager.get_blueprint_from_name(model)
         new_spawn_point = carla.Transform(
-            spawn_point.transform.location + carla.Location(z=0.1), spawn_point.transform.rotation
+            spawn_point.transform.location + carla.Location(z=0.1),
+            spawn_point.transform.rotation,
         )
         vehicle = self.world_manager.spawn_actor(ego_vehicle_bp, new_spawn_point)
         if vehicle is None:
@@ -271,7 +300,9 @@ class VehicleManager:
                     spawn_point.transform.location + carla.Location(z=0.1),
                     spawn_point.transform.rotation,
                 )
-                vehicle = self.world_manager.spawn_actor(ego_vehicle_bp, new_spawn_point)
+                vehicle = self.world_manager.spawn_actor(
+                    ego_vehicle_bp, new_spawn_point
+                )
 
         if vehicle is not None:
             self.vehicles.append(vehicle)
@@ -287,11 +318,28 @@ class VehicleManager:
                 continue
             spawn_point = pos_id_to_waypoint[agent["pos_id"]]
             if agent["relative_to_ego"].endswith("right"):
-                spawn_point = spawn_point.get_right_lane()
+                get_point = spawn_point.get_right_lane()
+                if (
+                    get_point is not None
+                    and get_point.lane_type != carla.LaneType.Driving
+                    and self.override_option
+                ):
+                    print("Right lane is not driving, override to left lane")
+                    get_point = spawn_point.get_left_lane()
+                spawn_point = get_point
                 if spawn_point is None:
                     continue
+
             if agent["relative_to_ego"].endswith("left"):
-                spawn_point = spawn_point.get_left_lane()
+                get_point = spawn_point.get_left_lane()
+                if (
+                    get_point is not None
+                    and get_point.lane_id * spawn_point.lane_id < 0
+                    and self.override_option
+                ):
+                    print("Left lane is not driving, override to right lane")
+                    get_point = spawn_point.get_right_lane()
+                spawn_point = get_point
                 if spawn_point is None:
                     continue
 
@@ -320,7 +368,11 @@ class VehicleManager:
             for spawn_point in waypoint_list:
                 self.world_manager.draw_point(spawn_point.transform.location)
         for agent_idx, agent in enumerate(agent_info, 1):
-            valid_num = len(waypoint_list) - NUM_POINT_PER_CAR * (len(agent_info) - agent_idx) - 1
+            valid_num = (
+                len(waypoint_list)
+                - NUM_POINT_PER_CAR * (len(agent_info) - agent_idx)
+                - 1
+            )
             valid_points = waypoint_list[:valid_num]
             spawn_point = random.choice(valid_points)
 
@@ -356,7 +408,10 @@ class VehicleManager:
                 previous_pos_id += 1
             agent_on_pos = pos_id_to_agent[pos_id]
             maximum_points_required = max(
-                [AGENT_TYPE_TO_SIZE.get(x["type"], NUM_POINT_PER_CAR) for x in agent_on_pos]
+                [
+                    AGENT_TYPE_TO_SIZE.get(x["type"], NUM_POINT_PER_CAR)
+                    for x in agent_on_pos
+                ]
             )
             if get_plan:
                 if num_points_required + 1 < len(waypoints):
@@ -383,23 +438,61 @@ class VehicleManager:
         for agent in agent_info:
             if agent["type"] in CAR_TYPE and not agent["is_ego"]:
                 target_info[agent["relative_to_ego"]].append(agent)
-        direction_of_each_road = self.get_left_straight_right(ego_waypoint, get_road_id_only=True)
+        direction_of_each_road = self.get_left_straight_right(
+            ego_waypoint, get_road_id_only=True
+        )
         for relative_position, agents in target_info.items():
+            if self.override_option and (
+                (
+                    relative_position == "road_of_left_turn"
+                    and "have_left" not in direction_of_each_road
+                )
+                or (
+                    relative_position == "road_of_right_turn"
+                    and "have_right" not in direction_of_each_road
+                )
+            ):
+                relative_position = (
+                    "front_left"
+                    if relative_position == "road_of_left_turn"
+                    else "front_right"
+                )
+                for agent in agents:
+                    agent["relative_to_ego"] = relative_position
+                print(f"Override {relative_position} to {relative_position}")
+
             if relative_position in ["front", "front_left", "front_right"]:
                 self.spawn_car_from_selected_waypoint(agents, "front")
             elif relative_position in ["back", "back_left", "back_right"]:
                 self.spawn_car_from_selected_waypoint(agents, "back")
             elif relative_position == "left":
-                spawn_point = ego_waypoint.get_left_lane()
+                get_point = ego_waypoint.get_left_lane()
+                if (
+                    get_point is not None
+                    and get_point.lane_id * ego_waypoint.lane_id < 0
+                    and self.override_option
+                ):
+                    print("Failed to spawn left lane, try right lane")
+                    get_point = ego_waypoint.get_right_lane()
+                spawn_point = get_point
                 if spawn_point is None:
                     continue
                 self.spawn_car(spawn_point, "random", agents[0])
             elif relative_position == "right":
-                spawn_point = ego_waypoint.get_right_lane()
-                if spawn_point is None:
-                    continue
+                get_point = ego_waypoint.get_right_lane()
+                if (
+                    get_point is not None
+                    and get_point.lane_type != carla.LaneType.Driving
+                    and self.override_option
+                ):
+                    print("Failed to spawn right lane, try left lane")
+                    get_point = ego_waypoint.get_left_lane()
+                spawn_point = get_point
                 self.spawn_car(spawn_point, "random", agents[0])
-            elif relative_position == "road_of_left_turn" and "have_left" in direction_of_each_road:
+            elif (
+                relative_position == "road_of_left_turn"
+                and "have_left" in direction_of_each_road
+            ):
                 road_id_to_spawn = direction_of_each_road["have_left"]
                 waypoint = get_points_to_front(
                     ego_waypoint,
@@ -413,7 +506,8 @@ class VehicleManager:
                     sorted(agents, key=lambda x: x["pos_id"]),
                 )
             elif (
-                relative_position == "road_of_right_turn" and "have_right" in direction_of_each_road
+                relative_position == "road_of_right_turn"
+                and "have_right" in direction_of_each_road
             ):
                 road_id_to_spawn = direction_of_each_road["have_right"]
                 waypoint = get_points_to_front(
@@ -439,7 +533,10 @@ class VehicleManager:
                 previous_vector = make_vector(waypoint, move_one_more_forward)
                 self.spawn_car_from_list_of_waypoint(
                     check_direction_relative_to_ego_and_sample_all(
-                        self.world_manager, previous_vector, road_id_to_spawn, "straight"
+                        self.world_manager,
+                        previous_vector,
+                        road_id_to_spawn,
+                        "straight",
                     ),
                     sorted(agents, key=lambda x: x["pos_id"]),
                 )
@@ -447,8 +544,12 @@ class VehicleManager:
     def spawn_ego_car(self, road_id, agent_info, direction, at_junction=False):
         # left, right, front, back
         relative_agents_direction_count = [0, 0, 0, 0]
-        relative_agents_direction_count[2] = self.count_points_required("front", agent_info)
-        relative_agents_direction_count[3] = self.count_points_required("back", agent_info)
+        relative_agents_direction_count[2] = self.count_points_required(
+            "front", agent_info
+        )
+        relative_agents_direction_count[3] = self.count_points_required(
+            "back", agent_info
+        )
 
         self.front_required = relative_agents_direction_count[2]
         self.back_required = relative_agents_direction_count[3]
@@ -469,7 +570,9 @@ class VehicleManager:
             self.world_manager.get_left_right_driving_points(road_id)
         )
         choose_right = direction == "right"
-        waypoints_to_spawn = right_driving_points if choose_right else left_driving_points
+        waypoints_to_spawn = (
+            right_driving_points if choose_right else left_driving_points
+        )
 
         if len(waypoints_to_spawn) == 0:
             print("The road has no driving points")
@@ -502,13 +605,19 @@ class VehicleManager:
             target_lane_id = random.choice(list(valid_lane_id))
 
         remain_valid_driving_points = sorted(
-            [waypoint for waypoint in waypoints_to_spawn if waypoint.lane_id == target_lane_id],
+            [
+                waypoint
+                for waypoint in waypoints_to_spawn
+                if waypoint.lane_id == target_lane_id
+            ],
             key=lambda x: x.s,
             reverse=choose_right,
         )
         max_distance = max([waypoint.s for waypoint in remain_valid_driving_points])
         valid_start = relative_agents_direction_count[2]
-        valid_end = len(remain_valid_driving_points) - relative_agents_direction_count[3]
+        valid_end = (
+            len(remain_valid_driving_points) - relative_agents_direction_count[3]
+        )
         self.points_to_front = remain_valid_driving_points[:valid_start]
         self.points_to_back = remain_valid_driving_points[valid_end:]
         remain_valid_driving_points = remain_valid_driving_points[valid_start:valid_end]
@@ -549,7 +658,8 @@ class VehicleManager:
                 spectator = self.world_manager.world.get_spectator()
                 spectator.set_transform(
                     carla.Transform(
-                        vehicle.get_location() + carla.Location(z=50), carla.Rotation(pitch=-90)
+                        vehicle.get_location() + carla.Location(z=50),
+                        carla.Rotation(pitch=-90),
                     ),
                 )
             if agent is None:

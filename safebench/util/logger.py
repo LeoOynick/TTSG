@@ -1,7 +1,7 @@
-""" 
+"""
 Date: 2023-01-31 22:23:17
 LastEditTime: 2023-04-01 16:02:49
-Description: 
+Description:
     Copyright (c) 2022-2023 Safebench Team
 
     This work is licensed under the terms of the MIT license.
@@ -12,15 +12,14 @@ import atexit
 import json
 import os
 import os.path as osp
-import time
 import pickle
+import time
 
 import joblib
 import numpy as np
 import yaml
 
 from safebench.util.run_util import VideoRecorder, VideoRecorder_Perception
-
 
 # Where experiment outputs are saved by default:
 DEFAULT_DATA_DIR = osp.abspath(osp.dirname(osp.dirname(osp.dirname(__file__))))
@@ -244,21 +243,21 @@ class Logger:
                 )
                 self.eval_records = {}
 
-    def add_eval_results(self, scores=None, records=None):
+    def add_eval_results(self, scores=None, records=None, count=0):
         if scores is not None:
-            self.eval_results.update(scores)
+            if count == 0:
+                self.eval_results = scores
+            else:
+                for key, value in scores.items():
+                    self.eval_results[key] = (
+                        self.eval_results[key] * count + value
+                    ) / (count + 1)
         if records is not None:
             self.eval_records.update(records)
             return self.eval_records
 
-    #     def save_eval_results(self):
-    #         self.log(f'>> Saving evaluation results to {self.result_file}')
-    #         joblib.dump(self.eval_results, self.result_file)
-    #         self.log(f'>> Saving evaluation records to {self.record_file}, length: {len(self.eval_records)}')
-    #         joblib.dump(self.eval_records, self.record_file)
-
     def save_eval_results(self, name=None):
-        if name == None:
+        if name is None:
             self.log(f">> Saving evaluation results to {self.result_file}")
             joblib.dump(self.eval_results, self.result_file)
             self.log(

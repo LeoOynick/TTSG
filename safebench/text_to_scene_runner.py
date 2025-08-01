@@ -156,7 +156,7 @@ class TextToSceneRunner:
             f">> Initializing carla client with config file: {config.json_file}"
         )
         # The json file will be one of the behavior config file (e.g., behavior_1_opt.json)
-        carla_client = CarlaClient()
+        carla_client = CarlaClient(override_option=True)
         carla_client.set_world(self.world)
         return carla_client
 
@@ -332,6 +332,7 @@ class TextToSceneRunner:
         else:
             log_name = f"OPT_{behavior_name}_ROUTE-{route_id - 4}"
 
+        count = 0
         while len(data_loader) > 0:
             # sample scenarios
             sampled_scenario_configs, num_sampled_scenario = data_loader.sampler()
@@ -433,10 +434,9 @@ class TextToSceneRunner:
                 records=self.env.running_results
             )
             all_scores = score_function(all_running_results)
-            self.logger.add_eval_results(scores=all_scores)
+            self.logger.add_eval_results(scores=all_scores, count=count)
             self.logger.print_eval_results()
-            if len(self.env.running_results) % self.save_freq == 0:
-                self.logger.save_eval_results(log_name)
+            count += 1
 
         self.logger.save_eval_results(log_name)
 

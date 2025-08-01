@@ -106,6 +106,12 @@ def parse_args():
         default=3,
         help="The maximum retry for each stage",
     )
+    parser.add_argument(
+        "--override-option",
+        action="store_true",
+        help="Override option",
+        default=False,
+    )
     return parser.parse_args()
 
 
@@ -126,6 +132,7 @@ def text_to_scene(
     cache_dir: str = "graph_cache",
     return_ego: bool = False,
     max_retry: int = 3,
+    override_option: bool = False,
 ):
     chat_client = OpenAI()
     analysis_success = False
@@ -155,7 +162,9 @@ def text_to_scene(
         )
         try:
             analysis_output = analysis_response.choices[0].message.content
-            analysis_success, analysis_check_output = check_analysis_output(analysis_output)
+            analysis_success, analysis_check_output = check_analysis_output(
+                analysis_output
+            )
             print(f"{Style.BRIGHT}Analysis input{Style.RESET_ALL}: {analysis_input}")
             print(f"{Style.BRIGHT}Analysis output{Style.RESET_ALL}: {analysis_output}")
             print(
@@ -195,9 +204,13 @@ def text_to_scene(
         )
         try:
             retreival_output = retreival_response.choices[0].message.content
-            retreival_success, retreival_check_output = check_retreival_output(retreival_output)
+            retreival_success, retreival_check_output = check_retreival_output(
+                retreival_output
+            )
             print(f"{Style.BRIGHT}Retreival input{Style.RESET_ALL}: {retreival_input}")
-            print(f"{Style.BRIGHT}Retreival output{Style.RESET_ALL}: {retreival_output}")
+            print(
+                f"{Style.BRIGHT}Retreival output{Style.RESET_ALL}: {retreival_output}"
+            )
             print(
                 f"{Style.BRIGHT}Retreival check message{Style.RESET_ALL}: {Fore.GREEN + 'success' + Style.RESET_ALL if retreival_success else Fore.RED + retreival_check_output + Style.RESET_ALL}"
             )
@@ -234,11 +247,13 @@ def text_to_scene(
         )
         try:
             planning_output = planning_response.choices[0].message.content
-            planning_success, planning_check_output = check_planning_output(planning_output)
+            planning_success, planning_check_output = check_planning_output(
+                planning_output
+            )
             print(f"{Style.BRIGHT}Planning input{Style.RESET_ALL}: {planning_input}")
             print(f"{Style.BRIGHT}Planning output{Style.RESET_ALL}: {planning_output}")
             print(
-                f"{Style.BRIGHT}Planning check message{Style.RESET_ALL}: {Fore.GREEN  + 'success' + Style.RESET_ALL if planning_success else Fore.RED  + planning_check_output + Style.RESET_ALL}"
+                f"{Style.BRIGHT}Planning check message{Style.RESET_ALL}: {Fore.GREEN + 'success' + Style.RESET_ALL if planning_success else Fore.RED + planning_check_output + Style.RESET_ALL}"
             )
         except Exception:
             planning_output = None
@@ -269,6 +284,7 @@ def text_to_scene(
             port=port,
             map_folder=map_folder,
             return_ego=return_ego,
+            override_option=override_option,
         )
 
 
@@ -289,4 +305,5 @@ if __name__ == "__main__":
         cache_dir=args.cache_dir,
         return_ego=args.return_ego,
         max_retry=args.max_retry,
+        override_option=args.override_option,
     )

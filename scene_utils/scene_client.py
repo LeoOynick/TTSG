@@ -1,6 +1,6 @@
 import copy
-import secrets
 import random
+import secrets
 import weakref
 from collections import defaultdict
 from queue import Queue
@@ -39,6 +39,7 @@ class CarlaClient:
         port=2000,
         use_cache=True,
         cache_dir="graph_cache",
+        override_option=False,
     ):
         self.client = carla.Client(host, port)
         self.client.set_timeout(10.0)
@@ -49,7 +50,9 @@ class CarlaClient:
         )
         self.world = None
         self.agent_model_manager = AgentModelManager(self.client)
-        self.vehicle_manager = VehicleManager(self.graph_manager)
+        self.vehicle_manager = VehicleManager(
+            self.graph_manager, override_option=override_option
+        )
         self.pedestrian_manager = PedestrianManager()
         self.cyclist_manager = CyclistManager(self.graph_manager)
         self.world_manager = WorldManager()
@@ -103,10 +106,18 @@ class CarlaClient:
     def set_manager(self):
         self.agent_model_manager.set_blueprint(self.world.get_blueprint_library())
         self.world_manager.set_world(self.world)
-        self.vehicle_manager.set_new_manager(self.agent_model_manager, self.world_manager)
-        self.pedestrian_manager.set_new_manager(self.agent_model_manager, self.world_manager)
-        self.cyclist_manager.set_new_manager(self.agent_model_manager, self.world_manager)
-        self.graph_manager.set_town_name(inverse_format_town_name(self.world.get_map().name))
+        self.vehicle_manager.set_new_manager(
+            self.agent_model_manager, self.world_manager
+        )
+        self.pedestrian_manager.set_new_manager(
+            self.agent_model_manager, self.world_manager
+        )
+        self.cyclist_manager.set_new_manager(
+            self.agent_model_manager, self.world_manager
+        )
+        self.graph_manager.set_town_name(
+            inverse_format_town_name(self.world.get_map().name)
+        )
 
     def set_traffic_light_time(self, duration=20):
         actor_list = self.world.get_actors()
@@ -148,25 +159,35 @@ class CarlaClient:
         if self.front_camera is not None or self.bev_camera is not None:
             self.world.tick()
 
-    def sort_road_target(self, road_info, required_num_of_waypoints, action_list, road_type_list):
+    def sort_road_target(
+        self, road_info, required_num_of_waypoints, action_list, road_type_list
+    ):
         score = 0
 
         for action, relative_position in action_list:
-            if relative_position == "road_of_straight" and road_info["have_straight_from"]:
+            if (
+                relative_position == "road_of_straight"
+                and road_info["have_straight_from"]
+            ):
                 if action == "go_straight" and road_info["have_opposite"]:
                     score += 1
                 elif action == "turn_left" and road_info["can_turn_right"]:
                     score += 1
                 elif action == "turn_right" and road_info["can_turn_left"]:
                     score += 1
-            elif relative_position == "road_of_left_turn" and road_info["have_left_from"]:
+            elif (
+                relative_position == "road_of_left_turn" and road_info["have_left_from"]
+            ):
                 if action == "go_straight" and road_info["can_turn_right"]:
                     score += 1
                 elif action == "turn_left" and road_info["can_go_straight"]:
                     score += 1
                 elif action == "turn_right" and road_info["have_opposite"]:
                     score += 1
-            elif relative_position == "road_of_right_turn" and road_info["have_right_from"]:
+            elif (
+                relative_position == "road_of_right_turn"
+                and road_info["have_right_from"]
+            ):
                 if action == "go_straight" and road_info["can_turn_left"]:
                     score += 1
                 elif action == "turn_left" and road_info["have_opposite"]:
@@ -189,7 +210,9 @@ class CarlaClient:
             score = 0
         return score
 
-    def get_valid_road(self, road_condition, agent_type_list, action_list, road_type_list):
+    def get_valid_road(
+        self, road_condition, agent_type_list, action_list, road_type_list
+    ):
         road = retrieve_roads(self.graph_manager.graph, road_condition)
         if len(road) == 0:
             return None, None, None, None
@@ -205,7 +228,9 @@ class CarlaClient:
             if road_id in check_set[town_name]:
                 continue
             check_set[town_name].add(road_id)
-            road_target.append((format_town_name(town_name), [road_id], direction, node_info))
+            road_target.append(
+                (format_town_name(town_name), [road_id], direction, node_info)
+            )
         score_list = sorted(
             [
                 (
@@ -222,7 +247,8 @@ class CarlaClient:
 
         length_having_same_score = sum([score == max_score for score, _ in score_list])
         road_target = [
-            road_target[road_idx] for _, road_idx in score_list[:length_having_same_score]
+            road_target[road_idx]
+            for _, road_idx in score_list[:length_having_same_score]
         ]
 
         diff_number_of_lane = [
@@ -240,7 +266,9 @@ class CarlaClient:
     def spawn_ego_monitor(self):
         # Create sensor
         weak_self = weakref.ref(self)
-        camera_rgb_bp = self.agent_model_manager.get_blueprint_from_name("sensor.camera.rgb")
+        camera_rgb_bp = self.agent_model_manager.get_blueprint_from_name(
+            "sensor.camera.rgb"
+        )
         camera_rgb_bp.set_attribute("image_size_x", str(FRONT_CAMERA["image_size_x"]))
         camera_rgb_bp.set_attribute("image_size_y", str(FRONT_CAMERA["image_size_y"]))
         camera_rgb_bp.set_attribute("fov", str(FRONT_CAMERA["fov"]))
@@ -280,9 +308,11 @@ class CarlaClient:
         self.bev_camera = self.world.spawn_actor(
             camera_rgb_bp, bev_transform, attach_to=self.vehicle_manager.vehicles[0]
         )
-        self.bev_camera.listen(lambda image: self.parse_image(weak_self, image, "bev_image_queue"))
+        self.bev_camera.listen(
+            lambda image: self.parse_image(weak_self, image, "bev_image_queue")
+        )
         self.world.tick()
-        
+
     def set_seed(self, seed=None):
         if seed is None:
             seed = secrets.randbelow(1_000_000_000)
@@ -323,7 +353,9 @@ class CarlaClient:
 
         if ego_waypoint is not None:
             self.spawn_ego_monitor()
-            self.vehicle_manager.spawn_other_cars(agent_info, self.vehicle_manager.vehicles[0])
+            self.vehicle_manager.spawn_other_cars(
+                agent_info, self.vehicle_manager.vehicles[0]
+            )
 
             self.pedestrian_manager.set_pos_id_to_waypoints(self.vehicle_manager)
             self.pedestrian_manager.spawn_pedestrians(

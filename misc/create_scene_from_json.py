@@ -90,6 +90,7 @@ def scene_generation(
     port=2000,
     map_folder="maps",
     return_ego=False,
+    override_option=False,
 ):
     carla_client = CarlaClient(
         input_folder=map_folder,
@@ -97,6 +98,7 @@ def scene_generation(
         port=port,
         use_cache=use_cache,
         cache_dir=cache_dir,
+        override_option=override_option,
     )
     agent_planning = planning["agents"] + ([EGO_SETUP] if not return_ego else [])
     action_list = set()
@@ -124,7 +126,12 @@ def scene_generation(
 
     with open(f"{save_dir}/road_info.json", "w") as f:
         json.dump(
-            {"town": town_name, "road_id": road_id, "direction": direction, "road_info": road_info},
+            {
+                "town": town_name,
+                "road_id": road_id,
+                "direction": direction,
+                "road_info": road_info,
+            },
             f,
             indent=2,
         )
