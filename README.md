@@ -30,6 +30,7 @@ conda activate ttsg
 conda install pytorch==2.2.2 torchvision==0.17.2 pytorch-cuda=12.1 -c pytorch -c nvidia -y
 pip install carla==0.9.15  # Choose your specific Carla version
 pip install -r requirements.txt
+pip install shapely==2.0.4
 ```
 
 Next, set up your GPT model key. Obtain the API key from [OpenAI](https://platform.openai.com/api-keys) and save it to a .env file:
