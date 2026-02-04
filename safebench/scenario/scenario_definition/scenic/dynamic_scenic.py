@@ -45,7 +45,17 @@ class DynamicScenic(BasicScenario):
         """
         try:
             next(self.world.scenic.update_behavior)
-        except:
+        except StopIteration:
+            # Scenic generator finished (either scenario complete or failed). Mark terminate so
+            # ScenicScenario will stop and log cleanly.
+            self.terminate = True
+        except Exception as e:
+            # Surface the root cause instead of silently swallowing it; otherwise the runner
+            # stops immediately with zero timesteps recorded.
+            print(f"[DynamicScenic] scenic update failed: {e}")
+            import traceback
+
+            traceback.print_exc()
             self.terminate = True
 
     def check_scenic_terminate(self):

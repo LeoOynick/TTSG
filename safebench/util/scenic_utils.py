@@ -8,6 +8,8 @@ import enum
 import sys
 import time
 from collections import OrderedDict
+import contextlib
+import signal
 
 import numpy as np
 
@@ -21,6 +23,24 @@ import scenic.syntax.translator as translator
 from scenic.core.object_types import disableDynamicProxyFor
 from scenic.core.requirements import RequirementType
 from scenic.core.simulators import SimulationCreationError
+
+# Scenic's behavior execution uses signal.SIGALRM for a stuck-behavior watchdog,
+# which is unavailable on Windows. If SIGALRM is missing, replace alarm with
+# a no-op context manager to avoid immediate crashes during simulation.
+try:
+    import scenic.core.utils as scenic_core_utils
+    import scenic.core.dynamics as scenic_core_dynamics
+except Exception:
+    scenic_core_utils = None
+    scenic_core_dynamics = None
+
+if not hasattr(signal, "SIGALRM") and scenic_core_utils and scenic_core_dynamics:
+    @contextlib.contextmanager
+    def _no_alarm(*args, **kwargs):
+        yield
+
+    scenic_core_utils.alarm = _no_alarm
+    scenic_core_dynamics.alarm = _no_alarm
 
 
 def get_parser(scenicFile):

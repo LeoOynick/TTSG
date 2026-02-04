@@ -466,3 +466,4 @@ log
 **/bev_image
 **/front_image
 **/*cache
+.DS_Store
